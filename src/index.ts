@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-console.log('DB USER:', process.env.dbUser);  // Should print 'root'
+console.log('DB USER:', process.env.dbUser); 
 
 import express from "express";
 import booksRouter from "./routes/books";
