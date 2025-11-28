@@ -27,3 +27,14 @@ export async function registerUser(request: Request, response: Response) {
 
     return response.status(201).json({ message: 'Registration successful' });
 } 
+
+export async function loginUser(request: Request, response: Response) {
+    console.log("Login User Handler")
+    const {email,password}=request.body;
+    
+    const [user]=await pool.query("select * from users where email=? and password=?",[email,password]);
+    if ((user as any).length<=0){
+        return response.status(400).send("User does not exist");
+    }
+    return response.status(200).send("Login in Successful");
+}
