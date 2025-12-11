@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { generateToken } from "../jwt";
 import { pool } from "../models/db";
 
 export async function registerUser(request: Request, response: Response) {
@@ -32,9 +33,27 @@ export async function loginUser(request: Request, response: Response) {
     console.log("Login User Handler")
     const {email,password}=request.body;
     
-    const [user]=await pool.query("select * from users where email=? and password=?",[email,password]);
-    if ((user as any).length<=0){
-        return response.status(400).send("User does not exist");
+    try{
+        const result=await pool.query("select * from users where email=? and password=?",[email,password]);
+        const users=result[0] as any[];
+
+        if (users.length===0){
+            return response.status(400).send("Invalid email or password");
+        }
+
+        const user=users[0];
+
+        //generate Token
+        const token=generateToken(user.userID,user.Emailmail);
+        
+        response.json({
+            message:"Login Successfull",
+            token:token,
+            user:{userID:user.UserID,email:user.email,name:user.name}
+        });
     }
-    return response.status(200).send("Login in Successful");
+    catch (error) {
+        console.error('Error:', error);
+        response.status(500).json({ message: 'Server error' });
+    }
 }
